@@ -41,20 +41,24 @@ class Connector(Plugin):
         self.__running = False
         self.__thread.join()
 
-    def on_receive_message(self, message, sender, conversation):
+    def on_receive_message(self, message, sender, receiver, conversation):
         if self.__callback is not None:
             sender = self.translate_id_net2bot(sender)
-            self.__callback(message, sender, conversation)
+            receiver = self.translate_id_net2bot(receiver)
+            channel = Channel(sender, receiver, conversation)
+            self.__callback(message, channel)
 
-    def send_message(self, message, receiver, conversation):
-        receiver = self.translate_id_bot2net(receiver)
-        self.post(message, receiver, conversation)
+    def send_message(self, message, channel):
+        sender = self.translate_id_bot2net(channel.get_sender())
+        receiver = self.translate_id_bot2net(channel.get_receiver())
+        conversation = channel.get_conversation()
+        self.post(message, sender, receiver, conversation)
 
     @abstractmethod
     def on_schedule(self):
         pass
 
     @abstractmethod
-    def post(self, message, receiver, conversation):
+    def post(self, message, sender, receiver, conversation):
         pass
 
