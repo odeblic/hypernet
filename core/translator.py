@@ -2,8 +2,8 @@ import bidict
 
 
 class Translator(object):
-    def __init__(self):
-        self.__mapping = bidict.bidict()
+    def __init__(self, mapping=dict()):
+        self.__mapping = bidict.bidict(mapping)
 
     def add_id_pair(self, bot_id, net_id):
         if self.is_bot_id(bot_id):
