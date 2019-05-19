@@ -1,17 +1,12 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 import bidict
 from core.plugin import Plugin
-import re
 import threading
 
 
-class Connector(ABC, Plugin):
-    def __init__(self, name, mtu, id_mapping):
-        super().__init__()
-        pattern = re.compile("^[a-z][a-z0-9]+$")
-        if not pattern.match(name):
-            raise ValueError('Invalid name for Network')
-        self.__name = str(name)
+class Connector(Plugin):
+    def __init__(self, name, version, mtu, id_mapping):
+        super().__init__(name, version)
         if mtu < 1:
             raise ValueError('Invalid mtu')
         if len(id_mapping) < 1:
@@ -21,9 +16,6 @@ class Connector(ABC, Plugin):
         self.__thread = threading.Thread(target=self.event_loop)
         self.__callback = None
         self.__running = False
-
-    def get_name(self):
-        return self.__name
 
     def get_mtu(self):
         return self.__mtu

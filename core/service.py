@@ -1,18 +1,11 @@
-from abc import ABC, abstractmethod
+from abc import abstractmethod
 from core.plugin import Plugin
 
 
 class Service(Plugin):
     def __init__(self, name, version, configuration):
-        self.__name = str(name)
-        self.__version = int(version)
-        self.__configuration = object(configuration)
-
-    def get_name(self):
-        return self.__name
-
-    def get_version(self):
-        return self.__version
+        super().__init__(name, version)
+        self.__configuration = configuration
 
     def get_configuration(self):
         return self.__configuration

@@ -1,30 +1,39 @@
+from abc import ABC, abstractmethod
 import importlib
 import inspect
+import re
 import sys
 
 
-class Plugin(object):
-    def __init__(self, name=None):
+class Plugin(ABC):
+    def __init__(self, name, version):
+        super().__init__()
+        pattern = re.compile("^[a-z][a-z0-9]+$")
+        if not pattern.match(name):
+            raise ValueError('Invalid plugin name')
         self.__name = name
+        if version < 1:
+            raise ValueError('Invalid plugin version')
+        self.__version = version
 
     def get_name(self):
         return self.__name
+
+    def get_version(self):
+        return self.__version
 
     @staticmethod
     def discover(root_package, base_class):
         plugins = list()
         for plugin in root_package.PLUGINS:
             module = importlib.import_module(root_package.__name__ + '.' + plugin)
-            classes = list()
-            for c in inspect.getmembers(sys.modules[module.__name__], inspect.isclass):
-                class_name = c[0]
-                class_type = c[1]
+            for (class_name, class_type) in inspect.getmembers(sys.modules[module.__name__], inspect.isclass):
                 if issubclass(class_type, base_class) and id(class_type) != id(base_class):
-                    print('Loading plugin \033[35m{}\033[0m as a \033[34m{}\033[0m'.format(class_name.lower(), base_class.__name__.lower()))
-                    classes.append('\033[32m{}\033[0m'.format(class_name))
-                    plugins.append(class_type)
-                else:
-                    classes.append('\033[31m{}\033[0m'.format(class_name))
-        print('Found \033[33m{}\033[0m plugin(s) of type \033[34m{}\033[0m'.format(len(plugins), base_class.__name__.lower()))
+                    instance = class_type()
+                    print('Loading plugin \033[35m{}\033[0m (version \033[35m{}\033[0m) as a \033[34m{}\033[0m'.
+                        format(instance.get_name(), instance.get_version(), base_class.__name__.lower()))
+                    plugins.append(instance)
+        print('Found \033[33m{}\033[0m plugin(s) of type \033[34m{}\033[0m'.
+            format(len(plugins), base_class.__name__.lower()))
         return plugins
 
