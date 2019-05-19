@@ -20,6 +20,8 @@ A **service** is a subbot able to send and receive messages related to the featu
 
 A **connector** handles the connection to a network, with a dedicated account. It abstracts the format of messages to match the internal representation used within the framework.
 
+A **plugin** is a Python class declared as dynamically loadable by the bot to add features or implementation like services and connectors.
+
 ## Prerequisites
 
 You need Python **3.6** or **3.7** with the following packages available:
@@ -30,20 +32,30 @@ You need Python **3.6** or **3.7** with the following packages available:
 
 ## Build
 
-These tools are required to build the package.
+These tools are required to build the packages.
 
-```python -m pip install --user --upgrade setuptools wheel```
+```pip3 install --upgrade setuptools wheel```
 
-The following command generate the packages (tarball and wheel).
+The following command generates the packages (tarball and wheel).
 
-```python setup.py sdist bdist_wheel```
+```python3 setup.py sdist bdist_wheel```
+
+## Run
+
+These dependencies are required to run the program.
+
+```pip3 install -r requirements.txt```
+
+Just run the main script without any argument.
+
+```python3 hypernet.py```
 
 ## Installation
 
 Just run one of these commands, depending on which packaging you opt for (tarball or wheel).
 
-```pip install dist/hypernet-*.whl```
-```pip install dist/hypernet-*.tar.gz```
+```pip3 install dist/hypernet-*.whl```
+```pip3 install dist/hypernet-*.tar.gz```
 
 ## Makefile
 
