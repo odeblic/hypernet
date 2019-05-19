@@ -11,9 +11,9 @@ class Service(Plugin):
         return self.__configuration
 
     @abstractmethod
-    def on_message(self, message):
+    def on_message(self, message, channel):
         pass
 
-    def send_message(self, message):
+    def send_message(self, message, channel):
         pass
 
