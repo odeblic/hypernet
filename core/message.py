@@ -30,7 +30,7 @@ class Message(object):
         return result
 
     class Element(object):
-       """ A kind of token, part of a message """
+        """ A kind of token, part of a message """
         def __init__(self, content, form=None):
             self.content = content
             self.form = form
@@ -58,4 +58,17 @@ class Message(object):
             self.size = 1.
             self.fgcolor = (255, 255, 255)
             self.bgcolor = (0, 0, 0)
+
+    def __str__(self):
+        tokens = list()
+        for element in self.find_elements():
+            if isinstance(element, self.Word):
+                tokens.append('\033[35m{}\033[0m'.format(element))
+            elif isinstance(element, self.Mention):
+                tokens.append('\033[36m{}\033[0m'.format(element))
+            elif isinstance(element, self.Hashtag):
+                tokens.append('\033[34m{}\033[0m'.format(element))
+            else:
+                raise Exception('Invalid type for element')
+        return ' '.join(tokens)
 
