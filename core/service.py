@@ -17,3 +17,7 @@ class Service(Plugin):
     def send_message(self, message, channel):
         pass
 
+    @abstractmethod
+    def _on_schedule(self):
+        pass
+
