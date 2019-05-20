@@ -42,3 +42,21 @@ class Channel(object):
             conversation = self.__conversation
         return self.__class__(sender, receiver, conversation)
 
+    def __str__(self):
+        sender = self.get_sender()
+        receiver = self.get_receiver()
+        conversation = self.get_conversation()
+        if sender is not None:
+            sender_section = 'from \033[33m{}\033[0m'.format(sender)
+        else:
+            sender_section = 'from \033[36many\033[0m'
+        if receiver is not None:
+            receiver_section = 'to \033[33m{}\033[0m'.format(receiver)
+        else:
+            receiver_section = 'to \033[36many\033[0m'
+        if conversation is not None:
+            conversation_section = 'within \033[35m{}\033[0m'.format(conversation)
+        else:
+            conversation_section = ''
+        return '{} {} {}'.format(sender_section, receiver_section, conversation_section)
+
