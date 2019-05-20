@@ -24,7 +24,7 @@ class Plugin(ABC):
 
     @staticmethod
     def discover(root_package, base_class):
-        plugins = list()
+        plugins = dict()
         for plugin in root_package.PLUGINS:
             module = importlib.import_module(root_package.__name__ + '.' + plugin)
             for (class_name, class_type) in inspect.getmembers(sys.modules[module.__name__], inspect.isclass):
@@ -38,7 +38,7 @@ class Plugin(ABC):
                     else:
                         print('Loading plugin \033[35m{}\033[0m (version \033[35m{}\033[0m) as a \033[34m{}\033[0m'.
                             format(name, version, category))
-                    plugins.append(instance)
+                    plugins[name] = instance
         print('Found \033[33m{}\033[0m plugin(s) of type \033[34m{}\033[0m'.
             format(len(plugins), base_class.__name__.lower()))
         return plugins
