@@ -51,12 +51,12 @@ class Channel(object):
         else:
             sender_section = 'from \033[36many\033[0m'
         if receiver is not None:
-            receiver_section = 'to \033[33m{}\033[0m'.format(receiver)
+            receiver_section = ' to \033[33m{}\033[0m'.format(receiver)
         else:
-            receiver_section = 'to \033[36many\033[0m'
+            receiver_section = ' to \033[36many\033[0m'
         if conversation is not None:
-            conversation_section = 'within \033[35m{}\033[0m'.format(conversation)
+            conversation_section = ' within \033[31m{}\033[0m'.format(conversation)
         else:
             conversation_section = ''
-        return '{} {} {}'.format(sender_section, receiver_section, conversation_section)
+        return '{}{}{}'.format(sender_section, receiver_section, conversation_section)
 
