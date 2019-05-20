@@ -10,21 +10,13 @@ class Connector(Plugin):
         if mtu < 1:
             raise ValueError('Invalid mtu')
         self.__mtu = int(mtu)
-        self.__thread = threading.Thread(target=self.event_loop)
-        self.__callback = None
+        self.__thread = threading.Thread(target=self.__event_loop)
         self.__running = False
-        self.agents = Translator(id_mapping)
-        self.conversations = Translator()
-
-    def get_mtu(self):
-        return self.__mtu
-
-    def event_loop(self):
-        while self.__running:
-            self.on_schedule()
-
-    def subscribe(self, callback):
-        self.__callback = callback
+        self.__messages_to_network = list()
+        self.__messages_from_network = list()
+        self.__translator = Translator()
+        for bot_id, net_id in id_mapping.items():
+            self.__translator.add_agent(bot_id, net_id)
 
     def start(self):
         self.__running = True
@@ -34,25 +26,40 @@ class Connector(Plugin):
         self.__running = False
         self.__thread.join()
 
-    def on_receive_message(self, message, sender, receiver, conversation):
-        if self.__callback is not None:
-            sender = self.agents.net2bot(sender)
-            receiver = self.agents.net2bot(receiver)
-            conversation = self.conversations.net2bot(conversation)
-            channel = Channel(sender, receiver, conversation)
-            self.__callback(message, channel)
+    def get_mtu(self):
+        return self.__mtu
 
     def send_message(self, message, channel):
-        sender = self.agents.bot2net(channel.get_sender())
-        receiver = self.agents.bot2net(channel.get_receiver())
-        conversation = self.conversations.bot2net(channel.get_conversation())
-        self.post(message, sender, receiver, conversation)
+        """ Enqueue outgoing messages (framework to network) """
+        self.__messages_to_network.insert(0, (message, channel))
+
+    def receive_message(self):
+        """ Dequeue incoming messages (network to framework) """
+        if len(self.__messages_from_network) > 0:
+            return self.__messages_from_network.pop()
+        else:
+            return None
+
+    def _pop_message_to_send(self):
+        """ Dequeue outgoing messages (framework to network) """
+        if len(self.__messages_to_network) > 0:
+            (message, channel) = self.__messages_to_network.pop()
+            channel = self.__translator.bot2net(channel)
+            return (message, channel)
+        else:
+            return None
+
+    def _push_received_message(self, message, channel):
+        """ Enqueue incoming messages (network to framework) """
+        channel = self.__translator.net2bot(channel)
+        self.__messages_from_network.insert(0, (message, channel))
 
     @abstractmethod
-    def on_schedule(self):
+    def _on_schedule(self):
+        """ this method will be called repeatedly from an event loop """
         pass
 
-    @abstractmethod
-    def post(self, message, sender, receiver, conversation):
-        pass
+    def __event_loop(self):
+        while self.__running:
+            self._on_schedule()
 
