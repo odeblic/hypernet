@@ -15,11 +15,13 @@ class Translator(object):
                 self.__map[bot_id] = net_id
 
         def bot2net(self, bot_id):
+            if bot_id is None: return None
             if not self.__is_bot_id(bot_id):
                raise Exception('This identifier does not exist')
             return self.__map[bot_id]
 
         def net2bot(self, net_id):
+            if net_id is None: return None
             if not self.__is_net_id(net_id):
                self.__allocate_id(net_id)
             return self.__map.inverse[net_id]
