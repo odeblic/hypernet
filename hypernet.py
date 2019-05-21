@@ -51,7 +51,8 @@ class Bot(object):
 
                 # dispatch outgoing messages
                 for (message, channel) in outgoing_messages:
-                    pass
+                    for connector in self.__connectors.values():
+                        connector.send_message(message, channel)
 
         except KeyboardInterrupt:
             pass
