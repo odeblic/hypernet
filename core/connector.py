@@ -2,6 +2,7 @@ from abc import abstractmethod
 from core.plugin import Plugin
 from core.translator import Translator
 import threading
+import time
 
 
 class Connector(Plugin):
@@ -12,6 +13,7 @@ class Connector(Plugin):
         self.__mtu = int(mtu)
         self.__thread = threading.Thread(target=self.__event_loop)
         self.__running = False
+        self.__interval = float(0.1)
         self.__messages_to_network = list()
         self.__messages_from_network = list()
         self.__translator = Translator()
@@ -61,5 +63,6 @@ class Connector(Plugin):
 
     def __event_loop(self):
         while self.__running:
+            time.sleep(self.__interval)
             self._on_schedule()
 

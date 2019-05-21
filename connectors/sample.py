@@ -10,7 +10,10 @@ class Sample(Connector):
         super().__init__('sample', 7, 512, {'Globot':0, 'Jack Eleven':11, 'Anna Five':5})
 
     def _on_schedule(self):
-        time.sleep(1)
+        """ This method is called repeatedly from an event loop """
+
+        # sender/receiver/stream id's are automatically translated by the base class Connector
+        # when calling methods _pop_message_to_send() and _push_received_message()
 
         # example of incoming message for the bot in private
         message = Message.build('Hi @globot please ask for service #sample')
