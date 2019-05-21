@@ -1,7 +1,10 @@
-PYTHON=python3
-PIP=pip3
+PYTHON := $(shell which python3.7 || which python3.6)
+PIP := $(shell which pip3)
+VERSION := $(shell git describe --tags --dirty)
 
 help:
+	@printf 'Welcome to the project \e[33mHypernet\e[0m\n'
+	@printf '(version \e[35m'$(VERSION)'\e[0m)\n\n'
 	@echo -e 'List of available targets:'
 	@printf '\e[32m   help\e[0m     display help\n'
 	@printf '\e[32m   deps\e[0m     install dependencies\n'
@@ -15,12 +18,11 @@ deps:
 	$(PIP) install --user -r requirements.txt
 
 build:
-	$(PYTHON) setup.py sdist
+	echo -n $(VERSION) > version.txt
 	$(PYTHON) setup.py bdist
-	$(PYTHON) setup.py bdist_wheel
 
 install:
-	$(PIP) install --user dist/hypernet-0.1.tar.gz
+	$(PIP) install --user dist/hypernet-$(VERSION).*.tar.gz
 
 run:
 	$(PYTHON) hypernet.py

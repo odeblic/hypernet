@@ -1,5 +1,13 @@
 import setuptools
+import sys
 
+
+try:
+    with open("version.txt", "r") as f:
+        version = f.read()
+except FileNotFoundError:
+    print('You must either provide the file version.txt or build using make')
+    sys.exit(1)
 
 with open("README.md", "r") as f:
     long_description = f.read()
@@ -13,7 +21,7 @@ with open("requirements.txt", "r") as f:
 
 setuptools.setup(
     name = "hypernet",
-    version = "0.1",
+    version = version,
     author = "Olivier de BLIC",
     author_email = "odeblic@gmail.com",
     description = "A framework exposing different services over multiple networks",
