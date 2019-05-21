@@ -31,10 +31,11 @@ class Bot(object):
 
                 # dispatch incoming messages
                 for (message, channel) in incoming_messages:
-                    for element in message.find_elements(message.__class__.Hashtag):
-                        for name, service in self.__services.items():
-                            if service.get_name() == element[1:]:
-                                service.deliver_incoming_message(message, channel)
+                    if '@{}'.format(self.__name) in message.find_elements(message.__class__.Mention) or channel.get_conversation() is None:
+                        for element in message.find_elements(message.__class__.Hashtag):
+                            for name, service in self.__services.items():
+                                if service.get_name() == element[1:]:
+                                    service.deliver_incoming_message(message, channel)
 
                 # trigger services for processing
                 for service in self.__services.values():
