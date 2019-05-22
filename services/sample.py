@@ -1,4 +1,5 @@
 from core.service import Service
+import logging
 
 
 class Sample(Service):
@@ -15,4 +16,5 @@ class Sample(Service):
             conversation = channel.get_conversation()
             channel = channel.__class__(sender, receiver, conversation)
             self._outgoing_messages.insert(0, (message, channel))
+            logging.debug('service \033[32msample\033[0m replied to a message')
 
