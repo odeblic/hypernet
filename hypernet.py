@@ -31,10 +31,12 @@ class Bot(object):
 
                 # dispatch incoming messages
                 for (message, channel) in incoming_messages:
-                    if '@{}'.format(self.__name) in message.find_elements(message.__class__.Mention) or channel.get_conversation() is None:
+                    print('incoming message "{}" {}'.format(message, channel))
+                    if self.__name in message.find_elements(message.__class__.Mention) or channel.get_conversation() is None:
                         for element in message.find_elements(message.__class__.Hashtag):
                             for name, service in self.__services.items():
-                                if service.get_name() == element[1:]:
+                                if service.get_name() == element:
+                                    print('dispatched to service \033[32m{}\033[0m'.format(service.get_name()))
                                     service.deliver_incoming_message(message, channel)
 
                 # trigger services for processing
@@ -51,6 +53,7 @@ class Bot(object):
 
                 # dispatch outgoing messages
                 for (message, channel) in outgoing_messages:
+                    print('outgoing message "{}" {}'.format(message, channel))
                     for connector in self.__connectors.values():
                         connector.send_message(message, channel)
 
@@ -69,6 +72,6 @@ class Bot(object):
 
 
 if __name__ == '__main__':
-    bot = Bot('globot')
+    bot = Bot('innovate_bot_73')
     bot.main()
 
