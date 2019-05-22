@@ -9,13 +9,10 @@ class Sample(Service):
     def on_schedule(self):
         while len(self._incoming_messages) > 0:
             (message, channel) = self._incoming_messages.pop()
-            print('service:\tincoming message "{}" {}'.format(message, channel))
-
-            message = message.__class__.build('Here is #sample service. What can I do for you?')
+            message = message.__class__.build('I am a #sample service and I do nothing')
             sender = channel.get_receiver()
             receiver = channel.get_sender()
             conversation = channel.get_conversation()
             channel = channel.__class__(sender, receiver, conversation)
             self._outgoing_messages.insert(0, (message, channel))
-            print('service:\toutgoing message "{}" {}'.format(message, channel))
 
