@@ -31,6 +31,7 @@ clean:
 	rm -rf build
 	rm -rf dist
 	rm -rf hypernet.egg-info
+	rm version.txt
 	find -type f -name '*.pyc' -delete
 	find -type d -name '__pycache__' -exec rmdir {} +
 
