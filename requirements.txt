@@ -1,3 +1,10 @@
+# for the framework
+
 bidict
 nltk
 pyyaml
+
+# for the connector
+
+sym_api_client_python>=0.3
+xml
