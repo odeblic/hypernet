@@ -1,10 +1,11 @@
+import logging
 import time
-
 
 from core.connector import Connector
 from core.message import Message
 from core.plugin import Plugin
 from core.service import Service
+
 
 class Bot(object):
     def __init__(self, name):
@@ -13,7 +14,7 @@ class Bot(object):
         self.__services = dict()
 
     def main(self):
-        print('The bot \033[32m{}\033[0m is starting.'.format(self.__name))
+        logging.info('The bot \033[32m{}\033[0m is starting.'.format(self.__name))
         try:
             self.__load_plugins()
             for connector in self.__connectors.values():
@@ -31,12 +32,12 @@ class Bot(object):
 
                 # dispatch incoming messages
                 for (message, channel) in incoming_messages:
-                    print('incoming message "{}" {}'.format(message, channel))
+                    logging.info('incoming message "{}" {}'.format(message, channel))
                     if self.__name in message.find_elements(message.__class__.Mention) or channel.get_conversation() is None:
                         for element in message.find_elements(message.__class__.Hashtag):
                             for name, service in self.__services.items():
                                 if service.get_name() == element:
-                                    print('dispatched to service \033[32m{}\033[0m'.format(service.get_name()))
+                                    logging.debug('dispatched to service \033[32m{}\033[0m'.format(service.get_name()))
                                     service.deliver_incoming_message(message, channel)
 
                 # trigger services for processing
@@ -53,7 +54,7 @@ class Bot(object):
 
                 # dispatch outgoing messages
                 for (message, channel) in outgoing_messages:
-                    print('outgoing message "{}" {}'.format(message, channel))
+                    logging.info('outgoing message "{}" {}'.format(message, channel))
                     for connector in self.__connectors.values():
                         connector.send_message(message, channel)
 
@@ -62,7 +63,7 @@ class Bot(object):
         finally:
             for connector in self.__connectors.values():
                 connector.stop()
-            print('The bot \033[32m{}\033[0m has stopped.'.format(self.__name))
+            logging.info('The bot \033[32m{}\033[0m has stopped.'.format(self.__name))
 
     def __load_plugins(self):
         import connectors
@@ -72,6 +73,12 @@ class Bot(object):
 
 
 if __name__ == '__main__':
+    logging.basicConfig(filename='/dev/stdout',
+                        filemode='w',
+                        level=logging.DEBUG,
+                        format='[%(levelname)s]\t%(asctime)s %(message)s',
+                        datefmt='%Y-%m-%d %I:%M:%S')
+
     bot = Bot('innovate_bot_73')
     bot.main()
 

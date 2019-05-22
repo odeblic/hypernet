@@ -1,4 +1,5 @@
 import html
+import logging
 import re
 
 
@@ -26,7 +27,7 @@ class Message(object):
             elif Message.PATTERN_WORD.match(token):
                 message._add_element(cls.Word(token))
             else:
-                print('\033[31m{}\033[0m should maybe escaped as \033[32m{}\033[0m?'.format(token, html.escape(token)))
+                logging.debug('\033[31m{}\033[0m should maybe escaped as \033[32m{}\033[0m?'.format(token, html.escape(token)))
                 raise ValueError('{} is not a valid element value'.format(token))
         return message
 
