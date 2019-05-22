@@ -1,3 +1,4 @@
+import argparse
 import logging
 import time
 
@@ -73,7 +74,11 @@ class Bot(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(filename='/dev/stdout',
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--log", default="/dev/stdout", help="output file for logs")
+    arguments = parser.parse_args()
+
+    logging.basicConfig(filename=arguments.log,
                         filemode='w',
                         level=logging.DEBUG,
                         format='[%(levelname)s]\t%(asctime)s %(message)s',
