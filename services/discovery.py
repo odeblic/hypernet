@@ -16,7 +16,6 @@ class Discovery(Service):
         self.__before = datetime.datetime.now()
 
     def on_schedule(self):
-        return
         while len(self._incoming_messages) > 0:
             (message, channel) = self._incoming_messages.pop()
 

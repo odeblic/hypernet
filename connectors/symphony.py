@@ -36,6 +36,12 @@ class Symphony(Connector):
 
         self.__private_chats = dict({'cool':'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'})
 
+        self.__ht = { 'olivier'         : 349026222344437,
+                      'julien'          : 349026222344450,
+                      'innovate_bot_73' : 349026222344326,
+                      'innovate_bot_89' : 349026222344358,
+                    }
+
     def _on_schedule(self):
         ret = self._pop_message_to_send()
         if ret is not None:
@@ -45,7 +51,7 @@ class Symphony(Connector):
                 if isinstance(element, Message.Word):
                     tokens.append(self.make_word(element))
                 elif isinstance(element, Message.Mention):
-                    tokens.append(self.make_mention(element))
+                    tokens.append(self.make_mention_from_uid(self.__ht[element]))
                 elif isinstance(element, Message.Hashtag):
                     tokens.append(self.make_hashtag(element))
                 elif isinstance(element, Message.Number):
@@ -107,6 +113,10 @@ class Symphony(Connector):
     @staticmethod
     def make_word(text='Blablabla'):
         return '<b class="tempo-text-color--orange">{}</b>'.format(text)
+
+    @staticmethod
+    def make_mention_from_uid(user_id):
+        return '<mention uid="{}"/>'.format(user_id)
 
     @staticmethod
     def make_mention(name='someone'):
