@@ -15,7 +15,7 @@ class Alarm(Service):
 
         while len(self._incoming_messages) > 0:
             (message, channel) = self._incoming_messages.pop()
-            logging.debug('alarm:\tincoming message "{}" {}'.format(message, channel))
+            logging.debug('service \033[32malarm\033[0m says "{}" {}'.format(message, channel))
             seconds = self.extract_time(message)
             if seconds is not None:
                 self.__alarms.append((now, seconds, channel))
@@ -38,7 +38,7 @@ class Alarm(Service):
             message = Message.build('#alarm service has been requested {} seconds ago'.format(seconds))
             channel = self._bot.reply(channel)
             self._outgoing_messages.insert(0, (message, channel))
-            logging.debug('alarm:\toutgoing message "{}" {}'.format(message, channel))
+            logging.debug('service \033[32malarm\033[0m says "{}" {}'.format(message, channel))
 
         self.__alarms = waiting
 
