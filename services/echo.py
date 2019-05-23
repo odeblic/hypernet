@@ -19,5 +19,6 @@ class Echo(Service):
         sender = channel.get_receiver()
         receiver = channel.get_sender()
         conversation = channel.get_conversation()
-        return channel.__class__(sender, receiver, conversation)
+        network = channel.get_network()
+        return channel.__class__(sender, receiver, conversation, network)
 

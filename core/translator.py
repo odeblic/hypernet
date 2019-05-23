@@ -62,7 +62,8 @@ class Translator(object):
 
         return channel.__class__(snd_net_id,
                                  rcv_net_id,
-                                 con_net_id)
+                                 con_net_id,
+                                 channel.get_network())
 
     def net2bot(self, channel):
         snd_net_id = channel.get_sender()
@@ -75,5 +76,6 @@ class Translator(object):
 
         return channel.__class__(snd_bot_id,
                                  rcv_bot_id,
-                                 con_bot_id)
+                                 con_bot_id,
+                                 channel.get_network())
 

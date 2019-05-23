@@ -19,17 +19,17 @@ class Sample(Connector):
 
         # example of incoming message for the bot in private
         message = Message.build('Hi @globot please ask for service #sample')
-        channel = Channel(11, 0, None)
+        channel = Channel(11, 0, None, self.get_name())
         self._push_received_message(message, channel)
 
         # example of incoming message for the bot in chatroom
         message = Message.build('Hi @globot please ask for service #sample')
-        channel = Channel(60, 0, 777)
+        channel = Channel(60, 0, 777, self.get_name())
         self._push_received_message(message, channel)
 
         # example of incoming message in chatroom for another agent
         message = Message.build('Hi folks nothing new today')
-        channel = Channel(11, 60, 777)
+        channel = Channel(11, 60, 777, self.get_name())
         self._push_received_message(message, channel)
 
         # example of outgoing message

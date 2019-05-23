@@ -1,9 +1,10 @@
 class Channel(object):
     """ Identifiers of entities involved in a message """
-    def __init__(self, sender, receiver, conversation):
+    def __init__(self, sender, receiver, conversation, network):
         self.__sender = sender
         self.__receiver = receiver
         self.__conversation = conversation
+        self.__network = network
         if not self.is_valid():
             raise Exception('Invalid channel')
 
@@ -30,6 +31,9 @@ class Channel(object):
     def get_conversation(self):
         return self.__conversation
 
+    def get_network(self):
+        return self.__network
+
     def reply(self):
         sender = self.get_local_agent()
         receiver = self.__sender
@@ -55,8 +59,9 @@ class Channel(object):
         else:
             receiver_section = ' to \033[36many\033[0m'
         if conversation is not None:
-            conversation_section = ' within \033[31m{}\033[0m'.format(conversation)
+            conversation_section = ' in chatroom \033[31m{}\033[0m'.format(conversation)
         else:
-            conversation_section = ''
-        return '{}{}{}'.format(sender_section, receiver_section, conversation_section)
+            conversation_section = ' in private chat'
+        network_section = ' on network \033[34m{}\033[0m'.format(self.get_network())
+        return '{}{}{}{}'.format(sender_section, receiver_section, conversation_section, network_section)
 

@@ -19,7 +19,6 @@ class Ping(Service):
         sender = channel.get_receiver()
         receiver = channel.get_sender()
         conversation = channel.get_conversation()
-        return channel.__class__(sender, receiver, conversation)
-
-# latency measurement with ping/pong
+        network = channel.get_network()
+        return channel.__class__(sender, receiver, conversation, network)
 
