@@ -57,7 +57,8 @@ class Bot(object):
                 for (message, channel) in outgoing_messages:
                     logging.info('outgoing message "{}" {}'.format(message, channel))
                     for connector in self.__connectors.values():
-                        connector.send_message(message, channel)
+                        if channel.get_network() == connector.get_name():
+                            connector.send_message(message, channel)
 
         except KeyboardInterrupt:
             pass
