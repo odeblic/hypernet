@@ -1,0 +1,83 @@
+---
+
+core:
+  cachedir: '/dev/shm'
+  users:
+    alice: &alice
+      local_id: 111
+      kind: human
+      roles:
+        - manager
+    bob: &bob
+      local_id: 222
+      kind: human
+    charlie:
+      local_id: 333
+      kind: human
+    david:
+      local_id: 444
+      kind: human
+    elise:
+      local_id: 555
+      kind: human
+    tracker:
+      local_id: 666
+      kind: bot
+    arbitrage:
+      local_id: 777
+      kind: bot
+    bnpp:
+      local_id: 888
+      kind: company
+    bfam:
+      local_id: 999
+      kind: company
+
+# permissions
+
+services:
+  quotex:
+    private: True
+    confirmation: True
+    roles:
+      - trader
+      - developer
+      - admin
+      - manager
+  rekon:
+    private: False
+    confirmation: True
+    options: ''
+  pong:
+    private: False
+    confirmation: False
+    options: ''
+
+connectors:
+  symphony:
+    configdir: '/home/defmax/'
+    sizemax: 1     # KB
+    ratemax: 180   # msg/min
+    users:
+      alice:
+        <<: *alice
+        global_id: 1234
+      bob:
+        <<: *bob
+        global_id: 5678
+  email:
+    credentials:
+      login:
+      password:
+    sizemax: 1024  # KB
+    ratemax: 15    # msg/min
+    users:
+      alice:
+        <<: *alice
+        global_id: alice@corp.net
+      bob:
+        <<: *bob
+        global_id: bob@company.com
+
+...
+
