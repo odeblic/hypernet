@@ -83,7 +83,7 @@ if __name__ == '__main__':
                         filemode='w',
                         level=logging.DEBUG,
                         format='[%(levelname)s]\t%(asctime)s %(message)s',
-                        datefmt='%Y-%m-%d %I:%M:%S')
+                        datefmt='%Y-%m-%d %H:%M:%S')
 
     bot = Bot('innovate_bot_73')
     bot.main()
