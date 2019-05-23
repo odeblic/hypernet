@@ -4,7 +4,7 @@ import bidict
 class Translator(object):
     class Map(object):
         def __init__(self):
-            self.__map = bidict.bidict()
+            self.__map = bidict.bidict({'cool':'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'})
 
         def add_id_pair(self, bot_id, net_id):
             if self.__is_bot_id(bot_id):
