@@ -1,37 +1,44 @@
 from core.connector import Connector
 import smtplib
+import time
+import logging
 
 
 class EMail(Connector):
     def __init__(self):
-        super().__init__('email', None, 8*1024*1024, {'007':'james@mi6.en', '9999':'vlad@kgb.ru'})
+        super().__init__('email', 2, 8*1024*1024, {'007':'james@mi6.en', '9999':'vlad@kgb.ru'})
 
     def _on_schedule(self):
-        pass
+        time.sleep(4)
+        self.send_email('I want to test this email sender')
 
-    def action(self):
-        gmail_user = 'you@gmail.com'  
-        gmail_password = 'P@ssword!'
+    def send_email(self, body):
+        logging.debug('I send an email')
+        sent_from = 'olivier@hackathon.com'
+        to = ['olivier@hackathon.com']  
+        subject = 'Message routed from the framework'
 
-        sent_from = gmail_user  
-        to = ['me@gmail.com', 'bill@gmail.com']  
-        subject = 'OMG Super Important Message'  
-        body = "Hey, what's up?\n\n- You"
+        email_text = """From: %s
+To: %s
+Subject: %s
 
-        email_text = """\  
-        From: %s  
-        To: %s  
-        Subject: %s
-
-        %s
+%s
         """ % (sent_from, ", ".join(to), subject, body)
         try:
-            server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            logging.debug('I connect')
+            #server = smtplib.SMTP_SSL('smtp.gmail.com', 465)
+            server = smtplib.SMTP('localhost', 25)
+            logging.debug('I say hello')
             server.ehlo()
-            server.login(gmail_user, gmail_password)
-            server.sendmail(sent_from, to, email_text)
+            logging.debug('I log in')
+            server.login('olivier@hackathon.com', 'xxx')
+            logging.debug('I send the email')
+            server.sendmail('olivier@hackathon.com', 'olivier@hackathon.com', email_text)
+            logging.debug('I quit')
+            server.quit()
+            logging.debug('I close')
             server.close()
-            print('Email sent!')
+            logging.info('Email sent!')
         except:
-            print('Something went wrong...')
-
+            logging.error('Something went wrong...')
+            
