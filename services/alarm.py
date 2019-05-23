@@ -20,7 +20,7 @@ class Alarm(Service):
             if seconds is not None:
                 self.__alarms.append((now, seconds, channel))
             else:
-                channel = self.reply(channel)
+                channel = self._bot.reply(channel)
                 message = Message.build('#alarm service does not understand your request')
                 self._outgoing_messages.insert(0, (message, channel))
 
@@ -36,7 +36,7 @@ class Alarm(Service):
 
         for (timestamp, seconds, channel) in triggered:
             message = Message.build('#alarm service has been requested {} seconds ago'.format(seconds))
-            channel = self.reply(channel)
+            channel = self._bot.reply(channel)
             self._outgoing_messages.insert(0, (message, channel))
             logging.debug('alarm:\toutgoing message "{}" {}'.format(message, channel))
 
@@ -49,12 +49,4 @@ class Alarm(Service):
             return numbers[0]
         else:
             return None
-
-    @staticmethod
-    def reply(channel):
-        sender = channel.get_receiver()
-        receiver = channel.get_sender()
-        conversation = channel.get_conversation()
-        network = channel.get_network()
-        return channel.__class__(sender, receiver, conversation, network)
 
