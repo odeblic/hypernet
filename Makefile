@@ -35,5 +35,5 @@ clean:
 	find -type f -name '*.pyc' -delete
 	find -type d -name '__pycache__' -exec rmdir {} +
 
-.PHONY: help build install run clean
+.PHONY: help deps build install run clean
 
