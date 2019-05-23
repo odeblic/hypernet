@@ -1,25 +1,14 @@
 class Channel(object):
-    """ Identifiers of entities involved in a message """
-    def __init__(self, sender, receiver, conversation):
+    """ Identifiers of entities involved in a message to ensure its delivery """
+    def __init__(self, sender, receiver, conversation, network):
+        if sender is None:
+            raise Exception('A channel must have a sender')
+        elif receiver is None and conversation is None:
+            raise Exception('A channel must have either a receiver or a conversation')
         self.__sender = sender
         self.__receiver = receiver
         self.__conversation = conversation
-        if not self.is_valid():
-            raise Exception('Invalid channel')
-
-    def is_valid(self):
-        if self.__sender is None:
-            return False
-        elif self.__receiver is None and self.__conversation is None:
-            return False
-        else:
-            return True
-
-    def set_local_agent(self, local_agent):
-        self.__class__.__local_agent = local_agent
-
-    def get_local_agent(self):
-        return self.__class__.__local_agent
+        self.__network = network
 
     def get_sender(self):
         return self.__sender
@@ -30,17 +19,8 @@ class Channel(object):
     def get_conversation(self):
         return self.__conversation
 
-    def reply(self):
-        sender = self.get_local_agent()
-        receiver = self.__sender
-        return self.__class__(sender, receiver, self.__conversation)
-
-    def forward(self, remote_agent, conversation=None):
-        sender = self.get_local_agent()
-        receiver = remote_agent
-        if conversation is None:
-            conversation = self.__conversation
-        return self.__class__(sender, receiver, conversation)
+    def get_network(self):
+        return self.__network
 
     def __str__(self):
         sender = self.get_sender()
@@ -55,8 +35,9 @@ class Channel(object):
         else:
             receiver_section = ' to \033[36many\033[0m'
         if conversation is not None:
-            conversation_section = ' within \033[31m{}\033[0m'.format(conversation)
+            conversation_section = ' in chatroom \033[31m{}\033[0m'.format(conversation)
         else:
-            conversation_section = ''
-        return '{}{}{}'.format(sender_section, receiver_section, conversation_section)
+            conversation_section = ' in private chat'
+        network_section = ' on network \033[34m{}\033[0m'.format(self.get_network())
+        return '{}{}{}{}'.format(sender_section, receiver_section, conversation_section, network_section)
 

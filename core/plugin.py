@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import importlib
 import inspect
+import logging
 import re
 import sys
 
@@ -34,12 +35,12 @@ class Plugin(ABC):
                     version = instance.get_version()
                     category = base_class.__name__.lower()
                     if version is None:
-                        print('Loading plugin \033[35m{}\033[0m as a \033[34m{}\033[0m'.format(name, category))
+                        logging.info('Loading plugin \033[35m{}\033[0m as a \033[34m{}\033[0m'.format(name, category))
                     else:
-                        print('Loading plugin \033[35m{}\033[0m (version \033[35m{}\033[0m) as a \033[34m{}\033[0m'.
+                        logging.info('Loading plugin \033[35m{}\033[0m (version \033[35m{}\033[0m) as a \033[34m{}\033[0m'.
                             format(name, version, category))
                     plugins[name] = instance
-        print('Found \033[33m{}\033[0m plugin(s) of type \033[34m{}\033[0m'.
+        logging.info('Found \033[33m{}\033[0m plugin(s) of type \033[34m{}\033[0m'.
             format(len(plugins), base_class.__name__.lower()))
         return plugins
 

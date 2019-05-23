@@ -8,6 +8,7 @@ class Service(Plugin):
         self.__configuration = configuration
         self._incoming_messages = list()
         self._outgoing_messages = list()
+        self._bot = None
 
     def get_configuration(self):
         return self.__configuration
