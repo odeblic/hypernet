@@ -47,18 +47,22 @@ class Discovery(Service):
             #elif self.__active:
             #    logging.debug('service \033[32mdiscovery\033[0m has been triggered')
             else:
-                bot_name = channel.get_sender()
-                if channel.get_sender() in self.__pending:
-                    logging.debug('service \033[32mdiscovery\033[0m received a response')
-                    request_time = self.__pending[bot_name]
-                    response_time = datetime.datetime.now()
-                    latency = response_time - request_time
-                    self.__bots[bot_name] = latency.seconds
+                logging.debug('service \033[32mdiscovery\033[0m is scanning...')
+                #bot_name = channel.get_sender()
+                #if channel.get_sender() in self.__pending.keys():
+                #if channel.get_sender() in self.__bots.keys():
+                #logging.debug('service \033[32mdiscovery\033[0m received a response')
+                #request_time = self.__pending[bot_name]
+                #response_time = datetime.datetime.now()
+                #latency = response_time - request_time
+                #self.__bots[bot_name] = latency.seconds
 
-                    channel = self._bot.reply(channel)
-                    message.set_first_mention(channel.get_receiver())
-                    message.increment_numbers()
-                    self._outgoing_messages.insert(0, (message, channel))
+                #channel = self._bot.forward(channel, 'bot89')
+                message = Message.build('@bot89 #discovery 0')
+                channel = Channel('bot73', 'bot89', channel.get_conversation(), channel.get_network())
+                message.set_first_mention(channel.get_receiver())
+                message.increment_numbers()
+                self._outgoing_messages.insert(0, (message, channel))
                 #else:
                 #    logging.error('service \033[32mdiscovery\033[0m received a response by mistake')
 
