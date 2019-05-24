@@ -12,11 +12,10 @@ import xml.etree.ElementTree as ET
 
 class Symphony(Connector):
     def __init__(self):
-        super().__init__('symphony', 1, 1024*1024, {'globot'          : 0,
-                                                    'olivier'         : 349026222344437,
+        super().__init__('symphony', 1, 1024*1024, {'olivier'         : 349026222344437,
                                                     'julien'          : 349026222344450,
-                                                    'innovate_bot_73' : 349026222344326,
-                                                    'innovate_bot_89' : 349026222344358,
+                                                    'bot73'           : 349026222344326,
+                                                    'bot89'           : 349026222344358,
                                                     })
 
                                             # stream id bnpp2019hackathon  :  'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'
@@ -36,10 +35,10 @@ class Symphony(Connector):
 
         self.__private_chats = dict({'cool':'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'})
 
-        self.__ht = { 'olivier'         : 349026222344437,
-                      'julien'          : 349026222344450,
-                      'innovate_bot_73' : 349026222344326,
-                      'innovate_bot_89' : 349026222344358,
+        self.__ht = { 'olivier' : 349026222344437,
+                      'julien'  : 349026222344450,
+                      'bot73'   : 349026222344326,
+                      'bot89'   : 349026222344358,
                     }
 
     def _on_schedule(self):
@@ -94,7 +93,10 @@ class Symphony(Connector):
                             channel = Channel(initiator_id, None, stream_id, self.get_name())
                         else:
                             raise Exception('Invalid stream type')
-                        message = Message.build(str(plain, 'utf-8'))
+                        text = str(plain, 'utf-8')
+                        text = text.replace('innovate_bot_73', 'bot73')
+                        text = text.replace('innovate_bot_89', 'bot89')
+                        message = Message.build(text)
                         logging.debug('Message (internal representation): \033[35m{}\033[0m'.format(message))
                         self._push_received_message(message, channel)
 

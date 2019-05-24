@@ -17,7 +17,7 @@ class Framework(object):
     def __init__(self):
         self.__connectors = load_connectors()
         self.__bots = dict()
-        self.__bots['innovate_bot_73'] = Bot('innovate_bot_73')
+        self.__bots['bot73'] = Bot('bot73')
 
     def main(self):
         logging.info('The framework is starting')
@@ -45,6 +45,7 @@ class Framework(object):
                         if bot.get_name() in message.find_elements(message.__class__.Mention) \
                             or channel.get_conversation() is None \
                             or bot.get_name() == channel.get_receiver():
+                            channel = bot.own(channel)
                             dispatched = True
                             logging.debug('dispatched to bot \033[32m{}\033[0m'.format(bot.get_name()))
                             bot.deliver_incoming_message(message, channel)

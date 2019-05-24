@@ -11,11 +11,12 @@ class Discovery(Service):
 
     def __init__(self):
         super().__init__('discovery', 1, None)
-        self.__bots = dict({'innovate_bot_89':1000000})
+        self.__bots = dict({'bot89':1000000})
         self.__pending = dict()
         self.__before = datetime.datetime.now()
 
     def on_schedule(self):
+        return  # pattern req/resp or daemon?
         while len(self._incoming_messages) > 0:
             (message, channel) = self._incoming_messages.pop()
 
@@ -44,8 +45,8 @@ class Discovery(Service):
         if now - self.__before > self.INTERVAL:
             for name in self.__bots.keys():
                 self.__pending[name] = now
-                message = Message.build('@innovate_bot_89 #echo #discovery')
-                channel = Channel('innovate_bot_73', 'innovate_bot_89', 'cool', 'symphony')
+                message = Message.build('@bot89 #echo #discovery')
+                channel = Channel('bot73', 'bot89', 'cool', 'symphony')
                 self._outgoing_messages.insert(0, (message, channel))
                 logging.debug('service \033[32mdiscovery\033[0m is searching...')
             self.__before = now
