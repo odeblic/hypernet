@@ -27,8 +27,8 @@ class Discovery(Service):
                 self.__active = True
                 for name in self.__bots.keys():
                     self.__pending[name] = now
-                    message = Message.build('@bot89 #discovery 1')
-                    channel = Channel('bot73', 'bot89', 'cool', 'symphony')
+                    message = Message.build('@bot89 #discovery seqnum 47')
+                    channel = Channel('bot73', 'bot89', channel.get_conversation(), channel.get_network())
                     self._outgoing_messages.insert(0, (message, channel))
                     logging.debug('service \033[32mdiscovery\033[0m sent a request')
                 self.__before = now
@@ -46,7 +46,7 @@ class Discovery(Service):
                 self._outgoing_messages.insert(0, (message, channel))
             #elif self.__active:
             #    logging.debug('service \033[32mdiscovery\033[0m has been triggered')
-            else:
+            elif 'seqnum' in message.find_elements(message.__class__.Word):
                 logging.debug('service \033[32mdiscovery\033[0m is scanning...')
                 #bot_name = channel.get_sender()
                 #if channel.get_sender() in self.__pending.keys():
@@ -58,8 +58,8 @@ class Discovery(Service):
                 #self.__bots[bot_name] = latency.seconds
 
                 #channel = self._bot.forward(channel, 'bot89')
-                message = Message.build('@bot89 #discovery 0')
-                channel = Channel('bot73', 'bot89', channel.get_conversation(), channel.get_network())
+                #message = Message.build('@bot89 #discovery seqnum 47')
+                channel = self._bot.reply(channel)
                 message.set_first_mention(channel.get_receiver())
                 message.increment_numbers()
                 self._outgoing_messages.insert(0, (message, channel))

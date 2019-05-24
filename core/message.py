@@ -54,8 +54,8 @@ class Message(object):
         elements = list()
         for element in self.__elements:
             if isinstance(element, Message.Number):
-                element += 1
-                elements.append(Message.Number(str(element)))
+                element = int(element) + 1
+                elements.append(Message.Number(element))
             else:
                 elements.append(element)
         self.__elements = elements
