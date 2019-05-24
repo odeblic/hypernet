@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from core.plugin import Plugin
 from core.translator import Translator
+import logging
 import threading
 import time
 
@@ -18,6 +19,7 @@ class Connector(Plugin):
         self.__messages_from_network = list()
         self.__translator = Translator()
         for bot_id, net_id in id_mapping.items():
+            logging.debug('add pair id identifiers \033[36m{}\033[0m -> \033[36m{}\033[0m'.format(bot_id, net_id))
             self.__translator.add_agent(bot_id, net_id)
 
     def start(self):
