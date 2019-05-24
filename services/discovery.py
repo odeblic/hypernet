@@ -11,7 +11,7 @@ class Discovery(Service):
 
     def __init__(self):
         super().__init__('discovery', 1, None)
-        self.__bots = dict({'bot89':None})
+        self.__bots = dict({'bot89':None, 'bot73':None})
         self.__pending = dict()
         self.__before = datetime.datetime.now()
         self.__active = False
@@ -46,22 +46,21 @@ class Discovery(Service):
                 self._outgoing_messages.insert(0, (message, channel))
             #elif self.__active:
             #    logging.debug('service \033[32mdiscovery\033[0m has been triggered')
-            #else:
+            else:
+                bot_name = channel.get_sender()
+                if channel.get_sender() in self.__pending:
+                    logging.debug('service \033[32mdiscovery\033[0m received a response')
+                    request_time = self.__pending[bot_name]
+                    response_time = datetime.datetime.now()
+                    latency = response_time - request_time
+                    self.__bots[bot_name] = latency.seconds
 
-            bot_name = channel.get_sender()
-            if channel.get_sender() in self.__pending:
-                logging.debug('service \033[32mdiscovery\033[0m received a response')
-                request_time = self.__pending[bot_name]
-                response_time = datetime.datetime.now()
-                latency = response_time - request_time
-                self.__bots[bot_name] = latency.seconds
-
-                channel = self._bot.reply(channel)
-                message.set_first_mention(channel.get_receiver())
-                message.increment_numbers()
-                self._outgoing_messages.insert(0, (message, channel))
-            #else:
-            #    logging.error('service \033[32mdiscovery\033[0m received a response by mistake')
+                    channel = self._bot.reply(channel)
+                    message.set_first_mention(channel.get_receiver())
+                    message.increment_numbers()
+                    self._outgoing_messages.insert(0, (message, channel))
+                #else:
+                #    logging.error('service \033[32mdiscovery\033[0m received a response by mistake')
 
         return
 
