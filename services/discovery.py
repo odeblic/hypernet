@@ -27,8 +27,9 @@ class Discovery(Service):
                 self.__active = True
                 for name in self.__bots.keys():
                     self.__pending[name] = now
-                    message = Message.build('@bot89 #discovery seqnum 47')
-                    channel = Channel('bot73', 'bot89', channel.get_conversation(), channel.get_network())
+                    partner_bot = 'bot89'
+                    message = Message.build('@{} #discovery seqnum 47'.format(partner_bot))
+                    channel = Channel(self._bot.get_name(), partner_bot, channel.get_conversation(), channel.get_network())
                     self._outgoing_messages.insert(0, (message, channel))
                     logging.debug('service \033[32mdiscovery\033[0m sent a request')
                 self.__before = now
