@@ -36,12 +36,13 @@ class Discovery(Service):
                 logging.debug('service \033[32mdiscovery\033[0m is now inactive')
                 self.__active = False
             elif 'status' in message.find_elements(message.__class__.Word):
-                logging.debug('service \033[32mdiscovery\033[0m makes a report')
+                logging.debug('service \033[32mdiscovery\033[0m reports its status')
                 bots = list()
                 for (name, latency) in self.__bots.items():
                     bots.append('{} {}'.format(name, latency))
                 message = Message.build(' '.join(bots))
                 channel = self._bot.reply(channel)
+                message.set_first_mention(channel.get_receiver())
                 self._outgoing_messages.insert(0, (message, channel))
             #elif self.__active:
             #    logging.debug('service \033[32mdiscovery\033[0m has been triggered')
@@ -54,7 +55,7 @@ class Discovery(Service):
                 response_time = datetime.datetime.now()
                 latency = response_time - request_time
                 self.__bots[bot_name] = latency.seconds
-                
+
                 channel = self._bot.reply(channel)
                 message.set_first_mention(channel.get_receiver())
                 message.increment_numbers()

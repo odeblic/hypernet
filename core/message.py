@@ -42,8 +42,13 @@ class Message(object):
         return result
 
     def set_first_mention(self, mention):
-        if len(self.__elements) > 0 and isinstance(self.__elements[0], Message.Mention):
-            self.__elements[0] = Message.Mention(mention)
+        if len(self.__elements) > 0:
+            if isinstance(self.__elements[0], Message.Mention):
+                self.__elements[0] = Message.Mention(mention)
+            else:
+                self.__elements.insert(0, Message.Mention(mention))
+        else:
+            self.__elements.append(Message.Mention(mention))
 
     def increment_numbers(self):
         elements = list()
