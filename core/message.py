@@ -41,6 +41,20 @@ class Message(object):
                 result.append(element)
         return result
 
+    def set_first_mention(self, mention):
+        if len(self.__elements) > 0 and isinstance(self.__elements[0], Message.Mention):
+            self.__elements[0] = Message.Mention(mention)
+
+    def increment_numbers(self):
+        elements = list()
+        for element in self.__elements:
+            if isinstance(element, Message.Number):
+                element += 1
+                elements.append(Message.Number(str(element)))
+            else:
+                elements.append(element)
+        self.__elements = elements
+
     class Element(object):
         """ A kind of token, part of a message """
         def __init__(self, content, form=None):
