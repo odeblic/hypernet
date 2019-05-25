@@ -26,12 +26,12 @@ class Discovery(Service):
                 logging.debug('service \033[32mdiscovery\033[0m is now active')
                 self.__active = True
                 for name in self.__bots.keys():
-                    self.__pending[name] = now
-                    partner_bot = 'bot89'
-                    message = Message.build('@{} #discovery seqnum 47'.format(partner_bot))
-                    channel = Channel(self._bot.get_name(), partner_bot, channel.get_conversation(), channel.get_network())
-                    self._outgoing_messages.insert(0, (message, channel))
-                    logging.debug('service \033[32mdiscovery\033[0m sent a request')
+                    if name != self._bot.get_name():
+                        self.__pending[name] = now
+                        message = Message.build('@{} #discovery seqnum 47'.format(name))
+                        channel = Channel(self._bot.get_name(), name, channel.get_conversation(), channel.get_network())
+                        self._outgoing_messages.insert(0, (message, channel))
+                        logging.debug('service \033[32mdiscovery\033[0m sent a request')
                 self.__before = now
             elif 'stop' in message.find_elements(message.__class__.Word):
                 logging.debug('service \033[32mdiscovery\033[0m is now inactive')
