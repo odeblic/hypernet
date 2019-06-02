@@ -84,7 +84,7 @@ class Framework(object):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--log", default="/dev/stdout", help="output file for logs")
+    parser.add_argument("--log", default=None, help="output file for logs")
     arguments = parser.parse_args()
 
     logging.basicConfig(filename=arguments.log,
