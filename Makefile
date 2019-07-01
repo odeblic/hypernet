@@ -5,7 +5,7 @@ VERSION := $(shell git describe --tags --dirty)
 help:
 	@printf 'Welcome to the project \e[33mHypernet\e[0m\n'
 	@printf '(version \e[35m'$(VERSION)'\e[0m)\n\n'
-	@echo -e 'List of available targets:'
+	@printf 'List of available targets:'
 	@printf '\e[32m   help\e[0m     display help\n'
 	@printf '\e[32m   deps\e[0m     install dependencies\n'
 	@printf '\e[32m   build\e[0m    build the package\n'
