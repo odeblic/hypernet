@@ -3,6 +3,7 @@
 bidict
 nltk
 pyyaml
+yamale
 
 # for the connector
 
