@@ -1,0 +1,98 @@
+---
+
+core:
+  log_file: /var/log/hypernet.log
+  log_level: debug
+  interval: 1000  # ms
+  dynamic_config_location: 'file.json'
+  users:
+    - &julien
+      framework_id: julien
+      kind: human
+      roles:
+        - trader
+        - admin
+    - &olivier
+      framework_id: olivier
+      kind: human
+      roles:
+        - trader
+        - admin
+    - &bot73
+      framework_id: bot73
+      kind: hyperbot
+    - &bot89
+      framework_id: bot89
+      kind: hyperbot
+    - &r2d2
+      framework_id: r2d2
+      kind: robot
+    - &tobor
+      framework_id: tobor
+      kind: robot
+  conversations:
+    - &topic
+      framework_id: topic
+      description: 'Example of chat'
+      accessibility: private
+      participants:
+        - julien
+        - olivier
+        - bot73
+        - bot89
+
+plugins:
+  - module: 'file:/'
+    instances:
+      - name: symphony
+        arguments: ''
+  - module: 'file:/'
+    instances:
+      - name: email
+        arguments: ''
+
+services:
+  - plugin_id: quotex
+    required_roles:
+      - trader
+      - manager
+  - plugin: echo
+    required_roles:
+      - trader
+      - manager
+
+connectors:
+  - id: symphony
+    module: 'file:connectors/symphony.py'
+    arguments: 'config/bot73/rsa_config.json'
+#    arguments: 'config/bot89/rsa_config.json'
+    msg_size_max: 1      # KB
+    msg_rate_max: 180    # msg/min
+    inactive_period: 60  # seconds
+    users:
+      - <<: *julien
+        network_id: 349026222344450
+      - <<: *olivier
+        network_id: 349026222344437
+      - <<: *bot73
+        network_id: 349026222344326
+      - <<: *bot89
+        network_id: 349026222344358
+  - id: email
+    module: 'file:connectors/email.py'
+    arguments: 'config/connectors/email.ini'
+    sizemax: 1024    # KB
+    ratemax: 15      # msg/min
+    queuesize: 1000  # msg
+    users:
+      - <<: *julien
+        network_id: julien@hackathon.org
+      - <<: *olivier
+        network_id: olivier@hackathon.org
+      - <<: *bot73
+        network_id: bot73@hackathon.org
+      - <<: *bot89
+        network_id: bot89@hackathon.org
+
+...
+
