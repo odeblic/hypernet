@@ -1,60 +1,146 @@
+import abc
 import logging
-from core.plugin import Plugin
 
 
-def load_services():
-    import services
-    from core.service import Service
-    return Plugin.discover(services, Service)
 
 
-class Bot(object):
-    def __init__(self, name):
+
+import collections
+
+Subscriptions = collections.namedtuple('Subscription' , 'hashtags cashtags mentions')
+subscriptions = Subscriptions(dict(), dict(), dict())
+subscriptions = Subscriptions({1, 2, 3}, dict(), dict())
+
+getattr(subscriptions, 'hashtags')
+
+
+
+
+class Subscriptions(object):
+    def __init__(self):
+        self.__all = set()
+        self.__by_category = {
+            'hashtags': dict(),
+            'cashtags': dict(),
+            'mentions': dict(),
+            'senders': dict(),
+            'receivers': dict(),
+            'conversations': dict(),
+            'networks': dict(),
+        }
+
+    def add(self, subscriber, *, category='all', value=None):
+        if category == 'all':
+            self.__all.add(subscriber)
+        else:
+            if value not in self.__by_category[category]:
+                self.__by_category[category][value] = set()
+            subscribers = self.__by_category[category][value]
+            subscribers.add(subscriber)
+
+    def remove(self, subscriber, *, category='all', value=None):
+        if category == 'all':
+            self.__all.discard(subscriber)
+            for category, subscriptions in self.__by_category.items():
+                for value in subscriptions.keys():
+                    self.__by_category[category][value].discard(subscriber)
+                    if len(self.__by_category[category][value]) == 0:
+                        del self.__by_category[category][value]
+        else:
+            if value in self.__by_category[category].keys():
+                self.__by_category[category][value].discard(subscriber)
+                if len(self.__by_category[category][value]) == 0:
+                    del self.__by_category[category][value]
+
+    def get_subscribers(self, **kwargs):
+        all_subscribers = list(self.__all)
+        for category, value in kwargs.items():
+            if value in self.__by_category[category]:
+                all_subscribers += self.__by_category[category][value]
+        return all_subscribers
+
+    def print(self):
+        print('========= all =========')
+        for s in self.__all:
+            print('{} -> {}'.format('all', s))
+        print('========= categories =========')
+        for k, v in self.__by_category.items():
+            print('{} -> {}'.format(k, v))
+
+
+class Bot(abc.ABC):
+    def __init__(self, name=None):
         self.__name = name
-        self.__services = load_services()
-        for service in self.__services.values():
-            service._bot = self
+        self.__subscriptions = Subscriptions()
 
     def get_name(self):
         return self.__name
 
-    def deliver_incoming_message(self, message, channel):
-        #logging.debug('deliver_incoming_messages(...) for bot \033[32m{}\033[0m'.format(self.__name))
-        dispatched = False
-        for element in message.find_elements(message.__class__.Hashtag):
-            for name, service in self.__services.items():
-                if service.get_name() == element:
-                    logging.debug('dispatched to service \033[32m{}\033[0m'.format(service.get_name()))
-                    service.deliver_incoming_message(message, channel)
-                    dispatched = True
-        if not dispatched:
-            logging.debug('no dispatching (no matching service)')
+    def on_event(self, event):
+        logging.debug('bot {} got an event: {}'.format(self.__name, event)
+        if event.category == event.categories.MSG:
+            msg = event.payload
+            msg.
+        elif event.category == event.categories.MSG:
+            services = subscriptions.get_subscribers()
+            for service in services:
+                service.on_event(event)
+        else:
+            raise
 
-    def on_schedule(self):
-        #logging.debug('on_schedule(...) for bot \033[32m{}\033[0m'.format(self.__name))
-        for service in self.__services.values():
-            service.on_schedule()
+    def subscribe(self, subscriber, *, hashtags=[], cashtags=[], mentions=[], senders=[], receivers=[], conversations=[], networks=[]):
+        for hashtag in hashtags:
+            self.__subscriptions.add(subscriber, category='hashtags', value=hashtag)
+        for cashtag in cashtags:
+            self.__subscriptions.add(subscriber, category='cashtags', value=cashtag)
+        for mention in mentions:
+            self.__subscriptions.add(subscriber, category='mentions', value=mention)
+        for sender in senders:
+            self.__subscriptions.add(subscriber, category='senders', value=sender)
+        for receiver in receivers:
+            self.__subscriptions.add(subscriber, category='receivers', value=receiver)
+        for conversation in conversations:
+            self.__subscriptions.add(subscriber, category='conversations', value=conversation)
+        for network in networks:
+            self.__subscriptions.add(subscriber, category='networks', value=network)
 
-    def fetch_outgoing_messages(self):
-        #logging.debug('fetch_outgoing_messages(...) for bot \033[32m{}\033[0m'.format(self.__name))
-        outgoing_messages = list()
-        for service in self.__services.values():
-            while True:
-                ret = service.fetch_outgoing_message()
-                if ret is None: break
-                outgoing_messages.append(ret)
-        return outgoing_messages
+    def subscribe_all(self, subscriber):
+        self.__subscriptions.add(subscriber, category='all')
 
-    def own(self, channel):
-        logging.debug('bot \033[32m{}\033[0m is owning a message from \033[32m{}\033[0m'.format(self.__name, channel.get_sender()))
-        sender = channel.get_sender()
-        receiver = self.__name
+    def unsubscribe(self, subscriber, *, hashtags=[], cashtags=[], mentions=[], senders=[], receivers=[], conversations=[], networks=[]):
+        for hashtag in hashtags:
+            self.__subscriptions.remove(subscriber, category='hashtags', value=hashtag)
+        for cashtag in cashtags:
+            self.__subscriptions.remove(subscriber, category='cashtags', value=cashtag)
+        for mention in mentions:
+            self.__subscriptions.remove(subscriber, category='mentions', value=mention)
+        for sender in senders:
+            self.__subscriptions.remove(subscriber, category='senders', value=sender)
+        for receiver in receivers:
+            self.__subscriptions.remove(subscriber, category='receivers', value=receiver)
+        for conversation in conversations:
+            self.__subscriptions.remove(subscriber, category='conversations', value=conversation)
+        for network in networks:
+            self.__subscriptions.remove(subscriber, category='networks', value=network)
+
+    def unsubscribe_all(self, subscriber):
+        self.__subscriptions.remove(subscriber, category='all')
+
+
+class NamedBot(Bot):
+    def __init__(self, name):
+        super().__init__(name)
+
+    def send(self, channel, message):
+        logging.debug('bot {} is sending to {}'.format(self.__name, channel.get_sender()))
+        sender = self.__name
+        receiver = channel.get_sender()
         conversation = channel.get_conversation()
         network = channel.get_network()
         return channel.__class__(sender, receiver, conversation, network)
 
     def reply(self, channel):
-        logging.debug('bot \033[32m{}\033[0m is replying to \033[32m{}\033[0m'.format(self.__name, channel.get_sender()))
+        logging.debug('bot {} is replying to {}'.format(self.__name, channel.get_sender()))
         sender = self.__name
         receiver = channel.get_sender()
         conversation = channel.get_conversation()
@@ -62,7 +148,7 @@ class Bot(object):
         return channel.__class__(sender, receiver, conversation, network)
 
     def forward(self, channel, other_receiver, conversation=None):
-        logging.debug('bot \033[32m{}\033[0m is forwarding to \033[32m{}\033[0m'.format(self.__name, other_receiver))
+        logging.debug('bot {} is forwarding to {}'.format(self.__name, other_receiver))
         sender = self.__name
         if conversation is None:
             conversation = channel.get_conversation()
@@ -70,8 +156,14 @@ class Bot(object):
         return channel.__class__(sender, other_receiver, conversation, network)
 
     def route(self, channel, other_network):
-        logging.debug('bot \033[32m{}\033[0m is routing between networks \033[32m{}\033[0m and \033[32m{}\033[0m'.format(self.__name, channel.get_network(), other_network))
+        logging.debug('bot {} is routing between networks {} and {}'.format(self.__name, channel.get_network(), other_network))
         sender = self.__name
         receiver = channel.get_sender()
         conversation = channel.get_conversation()
         return channel.__class__(sender, receiver, conversation, other_network)
+
+
+class DefaultBot(Bot):
+    def __init__(self):
+        super().__init__()
+
