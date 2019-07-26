@@ -1,3 +1,7 @@
+"""Description"""
+
+__version__ = '1.0.0'
+
 from core.channel import Channel
 from core.service import Service
 from core.message import Message
@@ -5,12 +9,13 @@ import datetime
 import logging
 
 
-class Discovery(Service):
+class Main(Service):
     """ Measure the latency to remote bots and print a report on demand """
     INTERVAL = datetime.timedelta(seconds=5)
 
-    def __init__(self):
-        super().__init__('discovery', 1, None)
+    def __init__(self, name='discovery', arguments=''):
+        super().__init__(name)
+        logging.debug('service \033[32m{}\033[0m loaded with arguments "\033[34m{}\033[0m"'.format(name, arguments))
         self.__bots = dict({'bot89':None, 'bot73':None})
         self.__pending = dict()
         self.__active = False

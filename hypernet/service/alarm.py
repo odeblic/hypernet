@@ -1,13 +1,18 @@
+"""Description"""
+
+__version__ = '1.0.0'
+
 from core.message import Message
 from core.service import Service
 import datetime
 import logging
 
 
-class Alarm(Service):
+class Main(Service):
     """ Send back a message after a period of time """
-    def __init__(self):
-        super().__init__('alarm', 1, None)
+    def __init__(self, name='alarm', arguments=''):
+        super().__init__(name)
+        logging.debug('service \033[32m{}\033[0m loaded with arguments "\033[34m{}\033[0m"'.format(name, arguments))
         self.__alarms = list()
 
     def on_schedule(self):

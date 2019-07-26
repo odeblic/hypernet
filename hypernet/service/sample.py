@@ -1,11 +1,16 @@
+"""Description"""
+
+__version__ = '1.0.0'
+
 from core.service import Service
 import logging
 
 
-class Sample(Service):
+class Main(Service):
     """ A sample to show how to implement a plugged-in service """
-    def __init__(self):
-        super().__init__('sample', 8, None)
+    def __init__(self, name='sample', arguments=''):
+        super().__init__(name)
+        logging.debug('service \033[32m{}\033[0m loaded with arguments "\033[34m{}\033[0m"'.format(name, arguments))
 
     def on_schedule(self):
         while len(self._incoming_messages) > 0:

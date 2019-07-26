@@ -1,11 +1,16 @@
+"""Description"""
+
+__version__ = '1.0.0'
+
 from core.service import Service
 import logging
 
 
-class Echo(Service):
+class Main(Service):
     """ Resend every incoming message to the sender """
-    def __init__(self):
-        super().__init__('echo', 1, None)
+    def __init__(self, name='echo', arguments=''):
+        super().__init__(name)
+        logging.debug('service \033[32m{}\033[0m loaded with arguments "\033[34m{}\033[0m"'.format(name, arguments))
 
     def on_schedule(self):
         while len(self._incoming_messages) > 0:

@@ -9,19 +9,21 @@ from sym_api_client_python.clients.sym_bot_client import SymBotClient
 import logging
 import xml.etree.ElementTree as ET
 
+# If the message is sent from a one to one chat, it is considered for the bot.
+#
+# If the message is sent from a chat room, consider it is for the bot only if it contains a mention @bot
+#
 
 class Symphony(Connector):
-    def __init__(self):
-        super().__init__('symphony', 1, 1024*1024, {'olivier'         : 349026222344437,
-                                                    'julien'          : 349026222344450,
-                                                    'bot73'           : 349026222344326,
-                                                    'bot89'           : 349026222344358,
-                                                    })
+    _VERSION = 1
 
-                                            # stream id bnpp2019hackathon  :  'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'
-                                            # stream id julien__bot89      :  '_wLmUVr3OQkVU1Z_5rcHxn___pU2Y8uHdA'
-                                            # stream id olivier__bot73     :  'kq-BuonieYXqXALRDPSBAH___pUljzbbdA'
-                                            # stream id olivier__bot89     :  'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'
+    def __init__(self):
+        super().__init__()
+
+        # stream id bnpp2019hackathon  :  'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'
+        # stream id julien__bot89      :  '_wLmUVr3OQkVU1Z_5rcHxn___pU2Y8uHdA'
+        # stream id olivier__bot73     :  'kq-BuonieYXqXALRDPSBAH___pUljzbbdA'
+        # stream id olivier__bot89     :  'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'
 
         configure = SymConfig('config/bot73/rsa_config.json')
         #configure = SymConfig('config/bot89/rsa_config.json')
@@ -35,12 +37,6 @@ class Symphony(Connector):
 
         self.__private_chats = dict({'cool':'r5Z_MNRYQO5wba1iXlGyen___pU6TExodA'})
 
-        self.__ht = { 'olivier' : 349026222344437,
-                      'julien'  : 349026222344450,
-                      'bot73'   : 349026222344326,
-                      'bot89'   : 349026222344358,
-                    }
-
     def _on_schedule(self):
         ret = self._pop_message_to_send()
         if ret is not None:
@@ -50,7 +46,7 @@ class Symphony(Connector):
                 if isinstance(element, Message.Word):
                     tokens.append(self.make_word(element))
                 elif isinstance(element, Message.Mention):
-                    tokens.append(self.make_mention_from_uid(self.__ht[element]))
+                    tokens.append(self.make_mention_from_uid(element))
                 elif isinstance(element, Message.Hashtag):
                     tokens.append(self.make_hashtag(element))
                 elif isinstance(element, Message.Number):
@@ -62,6 +58,16 @@ class Symphony(Connector):
             stream_id = channel.get_conversation()
             if stream_id is None:
                 stream_id = self.__private_chats[channel.get_receiver()]
+
+            def set_first_mention(self, mention):
+                if len(self.__elements) > 0:
+                    if isinstance(self.__elements[0], Message.Mention):
+                        self.__elements[0] = Message.Mention(mention)
+                    else:
+                        self.__elements.insert(0, Message.Mention(mention))
+                else:
+                    self.__elements.append(Message.Mention(mention))
+
             self.bot_client.get_message_client().send_msg(stream_id, message)
 
         data = self.datafeed_event_service.read_datafeed(self.datafeed_event_service.datafeed_id)
@@ -86,18 +92,24 @@ class Symphony(Connector):
                         plain = ET.tostring(xml, encoding='utf-8', method='text')
                         logging.info('Message (plain text): \033[35m{}\033[0m'.format(plain))
 
-                        if stream_type == 'IM':
-                            self.__private_chats[initiator_id] = stream_id
-                            channel = Channel(initiator_id, local_bot_id, None, self.get_name())
-                        elif stream_type == 'ROOM':
-                            channel = Channel(initiator_id, None, stream_id, self.get_name())
-                        else:
-                            raise Exception('Invalid stream type')
                         text = str(plain, 'utf-8')
                         text = text.replace('innovate_bot_73', 'bot73')
                         text = text.replace('innovate_bot_89', 'bot89')
                         message = Message.build(text)
                         logging.debug('Message (internal representation): \033[35m{}\033[0m'.format(message))
+
+                        if stream_type == 'IM':
+                            #self.__private_chats[initiator_id] = stream_id
+                            receiver_id = local_bot_id
+                        elif stream_type == 'ROOM':
+                            if local_bot_id in message.find_elements(message.__class__.Mention):
+                                receiver_id = local_bot_id
+                            else:
+                                receiver_id = None
+                        else:
+                            raise Exception('Invalid stream type')
+
+                        channel = Channel(initiator_id, receiver_id, stream_id, self.get_name())
                         self._push_received_message(message, channel)
 
         """

@@ -29,15 +29,19 @@ setuptools.setup(
     long_description_content_type = "text/markdown",
     url = "https://github.com/odeblic/hypernet",
     license = "MIT License",
-    python_requires = '>=3.6, <4',
+    python_requires = '>=3.5, <4',
     packages = setuptools.find_packages(),
-    py_modules = ['hypernet'],
+    #py_modules = ['hypernet'],
     install_requires = install_requires,
     classifiers = [
+        "Programming Language :: Python :: 3.5",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
+    entry_points = {'console_scripts': [
+        'hypernet = hypernet.hypernet:main',
+        ]},
 )
 

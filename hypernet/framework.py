@@ -1,15 +1,14 @@
-import argparse
 import logging
-import sys
 import time
 import yamale
 import yaml
 
 
+__all__ = ['', '', '']
+
+
 from core.plugin import Plugin
 #from core.bot import Bot
-
-
 
 
 class Configuration(object):
@@ -19,8 +18,6 @@ class Configuration(object):
 
     def get(self):
         return self.__content
-
-
 
 
 class Framework(object):
@@ -75,27 +72,4 @@ class Framework(object):
 
         finally:
             logging.info('The framework has stopped')
-
-
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--log", default=None, help="output file for logs")
-    parser.add_argument("cfg", required=True, help="configuration file")
-    arguments = parser.parse_args()
-
-    logging.basicConfig(filename=arguments.log,
-                        filemode='w',
-                        level=logging.INFO,
-                        format='[%(levelname)s]\t%(asctime)s %(message)s',
-                        datefmt='%Y-%m-%d %H:%M:%S')
-
-    try:
-        framework = Framework(arguments.cfg)
-        framework.main()
-    except Exception as e:
-        logging.critical('The framework has aborted because of exception: {}'.format(e))
-        logging.exception('The framework has aborted because of exception: {}'.format(e))
-        raise
-
-    sys.exit(main())
 

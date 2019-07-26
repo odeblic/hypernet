@@ -1,12 +1,17 @@
+"""Description"""
+
+__version__ = '1.0.0'
+
 from core.service import Service
 import datetime
 import logging
 
 
-class Logme(Service):
+class Main(Service):
     """ Log every incoming message """
-    def __init__(self):
-        super().__init__('logme', 1, None)
+    def __init__(self, name='logme', arguments=''):
+        super().__init__(name)
+        logging.debug('service \033[32m{}\033[0m loaded with arguments "\033[34m{}\033[0m"'.format(name, arguments))
 
     def on_schedule(self):
         while len(self._incoming_messages) > 0:

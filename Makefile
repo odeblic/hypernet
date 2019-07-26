@@ -1,11 +1,13 @@
-PYTHON := $(shell which python3.7 || which python3.6)
+PYTHON := $(shell which python3.7 || which python3.6 || which python3.5)
 PIP := $(shell which pip3)
 VERSION := $(shell git describe --tags --dirty)
+
+.PHONY: help deps build install run clean
 
 help:
 	@printf 'Welcome to the project \e[33mHypernet\e[0m\n'
 	@printf '(version \e[35m'$(VERSION)'\e[0m)\n\n'
-	@printf 'List of available targets:'
+	@printf 'List of available targets:\n'
 	@printf '\e[32m   help\e[0m     display help\n'
 	@printf '\e[32m   deps\e[0m     install dependencies\n'
 	@printf '\e[32m   build\e[0m    build the package\n'
@@ -25,7 +27,7 @@ install:
 	$(PIP) install --user dist/hypernet-$(VERSION).*.tar.gz
 
 run:
-	$(PYTHON) hypernet.py
+	$(PYTHON) hypernet/main.py
 
 clean:
 	rm -rf build
@@ -33,7 +35,5 @@ clean:
 	rm -rf hypernet.egg-info
 	rm -rf version.txt
 	find -type f -name '*.pyc' -delete
-	find -type d -name '__pycache__' -exec rmdir {} +
-
-.PHONY: help deps build install run clean
+	find -type d -name '__pycache__' -exec rm -rf {} +
 
