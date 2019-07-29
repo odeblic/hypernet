@@ -1,5 +1,5 @@
 import abc
-import event
+import event.event
 import logging
 
 import collections
@@ -74,15 +74,15 @@ class Bot(abc.ABC):
     def get_name(self):
         pass
 
-    def on_event(self, event):
+    def on_event(self, e):
         logging.debug('bot {} got an event: {}'.format('self.__name', event))
-        if event.category == event.categories.MSG:
-            msg = event.payload
+        if e.category == event.event.Event.Category.MESSAGE:
+            msg = e.payload
             # msg.receiver
-        elif event.category == event.categories.MSG:
+        elif e.category == event.event.Event.Category.MESSAGE:
             services = self.__subscriptions.get_subscribers()
             for service in services:
-                service.on_event(event)
+                service.on_event(e)
         else:
             logging.error('this category of event is not accepted here: {}'.format(event.category))
 
@@ -171,4 +171,3 @@ class AnonymousBot(Bot):
 
     def get_name(self):
         return None
-

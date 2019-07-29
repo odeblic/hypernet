@@ -4,29 +4,39 @@ Send presence status events on given updates
 """
 
 import collections
-import event as evt
+import event.event
 import enum
 import logging
 
 
-class User(collections.namedtuple('User', 'identifier kind roles statuses')):
-    class Kind(enum.Enum):
-        UNKNOWN = 0
-        HUMAN = 1
-        ROBOT = 2
-        HYPERBOT = 3
+class Kind(enum.Enum):
+    UNKNOWN = 0
+    HUMAN = 1
+    ROBOT = 2
+    HYPERBOT = 3
 
+
+class PresenceStatus(enum.Enum):
+    UNKNOWN = enum.auto()
+    AVAILABLE = enum.auto()
+    NEARBY = enum.auto()
+    BUSY = enum.auto()
+    OFFLINE = enum.auto()
+    HEARTBEAT = enum.auto()
+
+
+class User(collections.namedtuple('User', 'identifier kind roles statuses')):
     @classmethod
     def make_human(cls, identifier, roles=None):
-        return cls.make(identifier, User.Kind.HUMAN, roles)
+        return cls.make(identifier, Kind.HUMAN, roles)
 
     @classmethod
     def make_robot(cls, identifier, roles=None):
-        return cls.make(identifier, User.Kind.ROBOT, roles)
+        return cls.make(identifier, Kind.ROBOT, roles)
 
     @classmethod
     def make_hyperbot(cls, identifier, roles=None):
-        return cls.make(identifier, User.Kind.HYPERBOT, roles)
+        return cls.make(identifier, Kind.HYPERBOT, roles)
 
     @classmethod
     def make(cls, identifier, kind, roles=None):
@@ -38,11 +48,11 @@ class User(collections.namedtuple('User', 'identifier kind roles statuses')):
 
     @classmethod
     def get_kind(cls, kind):
-        if kind.upper() in cls.Kind:
-            return cls.Kind[kind.upper()]
+        if kind.upper() in Kind:
+            return Kind[kind.upper()]
         else:
             logging.error('Invalid kind of user: {}'.format(kind))
-            return cls.Kind.UNKNOWN
+            return Kind.UNKNOWN
 
 
 class UserTable(object):
@@ -51,7 +61,7 @@ class UserTable(object):
         self.__subscribers = dict()
         self.__subscribers_all = set()
 
-    def subscribe(self, subscriber, identifiers=[]):
+    def subscribe(self, subscriber, identifiers):
         for identifier in identifiers:
             if identifier not in self.__subscribers:
                 self.__subscribers[identifier] = set()
@@ -60,7 +70,9 @@ class UserTable(object):
     def subscribe_all(self, subscriber):
         self.__subscribers_all.add(subscriber)
 
-    def unsubscribe(self, subscriber, identifier=[]):
+    def unsubscribe(self, subscriber, identifiers=None):
+        if identifiers is None:
+            identifiers = self.__subscribers
         for identifier in identifiers:
             if identifier in self.__subscribers:
                 self.__subscribers[identifier].discard(subscriber)
@@ -75,10 +87,10 @@ class UserTable(object):
                 if len(subscribers) == 0:
                     del subscribers
 
-    def on_event(self, event):
-        print(event)
-        if event.category == evt.event.Event.Category.USER_DISCOVERY:
-            self.__users[event.payload.framework_id] = dict()
-            self.__users[event.payload.framework_id]['identifier'] = event.payload.framework_id
-            self.__users[event.payload.framework_id]['kind'] = event.payload.kind
-            self.__users[event.payload.framework_id]['roles'] = event.payload.roles
+    def on_event(self, e):
+        print(e)
+        if e.category == event.event.Event.Category.USER_DISCOVERY:
+            self.__users[e.payload.framework_id] = dict()
+            self.__users[e.payload.framework_id]['identifier'] = e.payload.framework_id
+            self.__users[e.payload.framework_id]['kind'] = e.payload.kind
+            self.__users[e.payload.framework_id]['roles'] = e.payload.roles

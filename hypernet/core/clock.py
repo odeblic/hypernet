@@ -1,5 +1,5 @@
 """Send tick events on given times"""
-import event
+import event.event
 import time
 
 
@@ -27,6 +27,5 @@ class Clock(object):
         elapsed_time = now - self.__before
         if elapsed_time >= TICK_PERIOD:
             for subscriber in self.__subscribers:
-                subscriber.on_event(event.make_tick())
+                subscriber.on_event(event.event.make_tick())
             self.__before = now
-

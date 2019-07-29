@@ -36,14 +36,6 @@ class Event(collections.namedtuple('Event', 'category payload')):
             SHUTDOWN = enum.auto()
 
     class PresenceStatus(collections.namedtuple('PresenceStatus', 'identifier network status description')):
-        class Status(enum.Enum):
-            UNKNOWN = enum.auto()
-            AVAILABLE = enum.auto()
-            NEARBY = enum.auto()
-            BUSY = enum.auto()
-            OFFLINE = enum.auto()
-            HEARTBEAT = enum.auto()
-
         def __new__(cls, identifier, network, status, description=None):
             return cls(identifier, network, status, description)
 
