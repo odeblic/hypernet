@@ -27,7 +27,7 @@ install:
 	$(PIP) install --user dist/hypernet-$(VERSION).*.tar.gz
 
 run:
-	$(PYTHON) hypernet/main.py
+	$(PYTHON) hypernet/main.py hypernet.yaml
 
 clean:
 	rm -rf build

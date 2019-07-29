@@ -4,38 +4,45 @@ Send presence status events on given updates
 """
 
 import collections
+import event as evt
 import enum
-
-User = namedtuple('User' , 'alias identifier fullname kind roles')
-user = User('olivier', 'Olivier de BLIC', 'human', ['admin', 'trader', 'manager', 'dev'])
+import logging
 
 
 class User(collections.namedtuple('User', 'identifier kind roles statuses')):
     class Kind(enum.Enum):
+        UNKNOWN = 0
         HUMAN = 1
         ROBOT = 2
         HYPERBOT = 3
-        UNKNOWN = 4
 
-    @staticmethod
-    def make_human(identifier, roles=[]):
-        return User(identifier, User.Kind.HUMAN, roles, {})
+    @classmethod
+    def make_human(cls, identifier, roles=None):
+        return cls.make(identifier, User.Kind.HUMAN, roles)
 
-    @staticmethod
-    def make_robot(identifier, roles=[]):
-        return User(identifier, User.Kind.ROBOT, roles, {})
+    @classmethod
+    def make_robot(cls, identifier, roles=None):
+        return cls.make(identifier, User.Kind.ROBOT, roles)
 
-    @staticmethod
-    def make_hyperbot(identifier, roles=[]):
-        return User(identifier, User.Kind.HYPERBOT, roles, {})
+    @classmethod
+    def make_hyperbot(cls, identifier, roles=None):
+        return cls.make(identifier, User.Kind.HYPERBOT, roles)
 
-    @staticmethod
-    def make(identifier, kind, roles=[]):
-        if kind.upper() in User.Kind:
-            kind = User.Kind[kind]
-            return User(identifier, kind, roles, {})
+    @classmethod
+    def make(cls, identifier, kind, roles=None):
+        if roles is None:
+            roles = []
+            return cls(identifier, kind, roles, dict())
         else:
             raise
+
+    @classmethod
+    def get_kind(cls, kind):
+        if kind.upper() in cls.Kind:
+            return cls.Kind[kind.upper()]
+        else:
+            logging.error('Invalid kind of user: {}'.format(kind))
+            return cls.Kind.UNKNOWN
 
 
 class UserTable(object):
@@ -69,5 +76,9 @@ class UserTable(object):
                     del subscribers
 
     def on_event(self, event):
-        pass
-
+        print(event)
+        if event.category == evt.event.Event.Category.USER_DISCOVERY:
+            self.__users[event.payload.framework_id] = dict()
+            self.__users[event.payload.framework_id]['identifier'] = event.payload.framework_id
+            self.__users[event.payload.framework_id]['kind'] = event.payload.kind
+            self.__users[event.payload.framework_id]['roles'] = event.payload.roles

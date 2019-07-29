@@ -3,6 +3,9 @@ import event
 import time
 
 
+TICK_PERIOD = 1
+
+
 class Clock(object):
     def __init__(self):
         self.__subscribers = set()
@@ -22,7 +25,7 @@ class Clock(object):
     def on_schedule(self):
         now = time.monotonic()
         elapsed_time = now - self.__before
-        if elapsed_time >= tick_period:
+        if elapsed_time >= TICK_PERIOD:
             for subscriber in self.__subscribers:
                 subscriber.on_event(event.make_tick())
             self.__before = now

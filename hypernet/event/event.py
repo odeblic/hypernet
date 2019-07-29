@@ -5,32 +5,57 @@ import logging
 import re
 
 
-class Event(collections.namedtuple('Event', 'category data')):
+def make_user(framework_id, kind, roles):
+    user = Event.UserDiscovery(framework_id, kind, roles, None, None)
+    return Event(Event.Category.USER_DISCOVERY, user)
+
+
+class Event(collections.namedtuple('Event', 'category payload')):
     class Category(enum.Enum):
         MESSAGE = enum.auto()
         TICK = enum.auto()
-        USER_STATUS_UPDATE = enum.auto()
-        USER_ID_UPDATE = enum.auto()
+        PRESENCE_STATUS = enum.auto()
+        USER_DISCOVERY = enum.auto()
         CONNECTOR_STATUS = enum.auto()
 
-    Channel = namedtuple('Channel' , 'sender receiver conversation network')
-    channel = Channel('olivier', 'julien', 'topic', 'symphony')
+    class Message(collections.namedtuple('Message', 'channel flags content mentions attachments')):
+        class Channel(collections.namedtuple('Channel', 'sender receiver conversation network')):
+            pass
 
-    Message = namedtuple('Message' , 'channel flags content mentions attachments')
-    message = Message(channel, [], [], [], [])
-
-    PresenceStatus = namedtuple('PresenceStatus' , 'user status description')
-    presence_status = PresenceStatus('olivier', 'busy', 'I am working hard...')
-
-    class Tick(collections.namedtuple('Tick' , 'trigger date argument')):
+    class Tick(collections.namedtuple('Tick', 'trigger date argument')):
         class Category(enum.Enum):
             ALARM = enum.auto()
             COUNTDOWN = enum.auto()
             PERIOD = enum.auto()
 
-    tick = Tick('alarm', 0, 'some data')
+    class ConnectorStatus(collections.namedtuple('ConnectorCommand', 'command argument')):
+        class Category(enum.Enum):
+            READY = enum.auto()
+            UP = enum.auto()
+            DOWN = enum.auto()
+            SHUTDOWN = enum.auto()
+
+    class PresenceStatus(collections.namedtuple('PresenceStatus', 'identifier network status description')):
+        class Status(enum.Enum):
+            UNKNOWN = enum.auto()
+            AVAILABLE = enum.auto()
+            NEARBY = enum.auto()
+            BUSY = enum.auto()
+            OFFLINE = enum.auto()
+            HEARTBEAT = enum.auto()
+
+        def __new__(cls, identifier, network, status, description=None):
+            return cls(identifier, network, status, description)
+
+    # class UserCreation(collections.namedtuple('UserCreation' , 'framework_id kind roles network_id network')):
+    # class UserAmendment(collections.namedtuple('UserAmendment' , 'framework_id kind roles network_id network')):
+    class UserDiscovery(collections.namedtuple('UserDiscovery', 'framework_id kind roles network_id network')):
+        def __new__(cls, framework_id, kind, roles, network_id, network=None):
+            # return cls(framework_id, kind, roles, network_id, network)
+            return super().__new__(cls, framework_id, kind, roles, network_id, network)
 
 
+"""
     class ConnectorCommand(collections.namedtuple('ConnectorCommand' , 'command argument')):
         class Category(enum.Enum):
             KILL = enum.auto()
@@ -41,129 +66,38 @@ class Event(collections.namedtuple('Event', 'category data')):
             START = enum.auto()
             STOP = enum.auto()
 
-    class ConnectorStatus(collections.namedtuple('ConnectorCommand' , 'command argument')):
-        class Category(enum.Enum):
-            READY = enum.auto()
-            UP = enum.auto()
-            DOWN = enum.auto()
-            OK = enum.auto()
-            ERROR = enum.auto()
-
-    class UserStatus(collections.namedtuple('UserStatus' , 'identifier network status description')):
-        class Category(enum.Enum):
-            UNKOWN = enum.auto()
-            AVAILABLE = enum.auto()
-            NEARBY = enum.auto()
-            BUSY = enum.auto()
-            OFFLINE = enum.auto()
-            HEARTBEAT = enum.auto()
-
-
-    class User(collections.namedtuple('User' , 'identifier status description')):
-        class Category(enum.Enum):
-            UNKOWN = enum.auto()
-            AVAILABLE = enum.auto()
-            NEARBY = enum.auto()
-            BUSY = enum.auto()
-            OFFLINE = enum.auto()
-            HEARTBEAT = enum.auto()
-
     class ConversationUpdate(collections.namedtuple('ConversationUpdate' , 'identifier type')):
         class Category(enum.Enum):
             OPEN = enum.auto()
             CLOSE = enum.auto()
 
-USER_DISCOVERY
-  network
-  framework_id
-  network_id
-USER_CREATION
-  framework_id
-  kind
-  roles
-  network
-  network_id
-USER_AMENDMENT
-  network
-  identifier
-  framework_identifier
-  network_identifier
+timestamp
 
+add_conversation
+  name
+  members
 
+rem_conversation
 
-
-data_framework
-  name 'jojo'
-  identifier 12345
-  kind HUMAN
-  roles ['admin', 'trader', 'guest']
-  network_identifiers {'symphony': 338478237829}
-  presence_statuses {'symphony': 'offline'}
-
-data_connector
-  name 'jojo'
-  identifier 'jojo@gmail.com'
-
-
-
-
-event_framework
-  name 'jojo'
-  identifier 12345
-  kind HUMAN
-  roles ['admin', 'trader', 'guest']
-
-event_connector
-  network 'symphony'
-  name '???'
-  identifier 'jojo@gmail.com'
-
-
-
-
-    def make_message(text):
-        return Event(Event.Category.MESSAGE, text)
-
-    def make_tick():
-        return Event(Event.Category.TICK, None)
-
-    def make_user_status(user, status, description=None):
-        return Event(Event.Category.USER_STATUS_UPDATE, None)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class Message(Event):
-    def __init__(self, sender, receiver, conversation, network, payload):
-        self.__sender = sender
-        self.__receiver = receiver
-        self.__conversation = conversation
-        self.__network = network
-        self.__content = content
-
+"""
 
 
 class Content(object):
-    def __init__(self):
-        pass
+    STD_RENDERER = 1
+    STD_PARSER = 2
+
+    def __init__(self, text):
+        self.__content = text
 
     @classmethod
-    def parse(cls, bytes, parser=stdparser):
-        content = cls()
-        return content
+    def parse(cls, binary, parser=STD_PARSER):
+        text = binary.decode('utf8')
+        return cls(text)
 
-    def render(self, renderer=stdrenderer):
-        return bytes()
+    def render(self, renderer=STD_RENDERER):
+        binary = bytes()
+        binary += self.__content.encode('utf8')
+        return binary
 
     """
     <<<
@@ -185,9 +119,9 @@ class Content(object):
 
     =binary/name/type/subtype
 
-    |
-    [
-    ]
+    | opener
+    [ inter
+    ] closer
 
     yyyy-mm-dd
     hh:mm:ss.uuu
@@ -196,7 +130,7 @@ class Content(object):
 
     @@hypermention
 
-    {size,color,bold,noitalic}  large, medium, small ; red, blue, orange, green, yellow, purple, pink, black, white ; dark, bright
+    {format}
 
     mentions
     1=jojo
@@ -208,23 +142,31 @@ class Content(object):
     """
 
 
+class Format(collections.namedtuple('Format', 'size color light bold italic underlined')):
+    """Presentation should not contain any kind of information since it is not guaranteed to be rendered as expected"""
+    class Size(enum.Enum):
+        SMALL = enum.auto()
+        NORMAL = enum.auto()
+        LARGE = enum.auto()
 
+    class Color(enum.Enum):
+        RED = enum.auto()
+        BLUE = enum.auto()
+        ORANGE = enum.auto()
+        GREEN = enum.auto()
+        YELLOW = enum.auto()
+        PURPLE = enum.auto()
+        PINK = enum.auto()
+        BLACK = enum.auto()
+        WHITE = enum.auto()
 
-"""
-presence statun
-  user
-  status
-  description
+    class Light(enum.Enum):
+        DARK = enum.auto()
+        NORMAL = enum.auto()
+        BRIGHT = enum.auto()
 
-timestamp
-
-add_conversation
-  name
-  members
-
-rem_conversation
-
-"""
+    def __new__(cls, *, size=Size.NORMAL, color=Color.BLACK, light=Light.NORMAL, bold=False, italic=False, underlined=False):
+        return cls(size, color, light, bold, italic, underlined)
 
 
 class Message(object):
@@ -232,19 +174,21 @@ class Message(object):
 
     PATTERN_MENTION = re.compile("^@[_A-Za-z0-9]+$")
     PATTERN_HASHTAG = re.compile("^#[_A-Za-z0-9]+$")
-    PATTERN_CASHTAG = re.compile("^\$[_A-Za-z0-9]+$")
+    PATTERN_CASHTAG = re.compile("^$[_A-Za-z0-9]+$")
+    PATTERN_NUMBER = re.compile("^[0-9]+([.][0-9]+)?$")
     PATTERN_INT = re.compile("^[0-9]+$")
-    PATTERN_FLOAT = re.compile("^[0-9]+(\.[0-9]+)?$")
+    PATTERN_FLOAT = re.compile("^[0-9]+[.][0-9]+$")
     PATTERN_WORD = re.compile("^[A-Z_a-z0-9]+$")
     PATTERN_STRING = re.compile("^[A-Z_a-z0-9]+$")
     PATTERN_OTHER = re.compile("^[A-Z_a-z0-9]+$")
 
-    #PATTERN_DATE = re.compile("^[0-9]+$")
-    #PATTERN_TIME = re.compile("^[0-9]+$") # [0-23][0-23][0-9][hH](:[0-59])? [1-12](:[0-59])?(AM|PM)
-    #PATTERN_EMAIL = re.compile("^[0-9]+$")
-    #PATTERN_TIME = re.compile("^[0-9]+$")
-    #PATTERN_SEPARATOR = re.compile("^[\n\t.,]$")
+    PATTERN_DATE = re.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+    PATTERN_TIME = re.compile("^[0-9]{2}:[0-9]{2}(:[0-9]{2}(:[0-9]{1;6})?)?$")
+    # [0-23][0-23][0-9][hH](:[0-59])? [1-12](:[0-59])?(AM|PM)
+    # PATTERN_EMAIL = re.compile("^[0-9]+$")
+    PATTERN_SEPARATOR = re.compile("^[\n\t.,]$")
 
+    @staticmethod
     def num(s):
         try:
             return int(s)
@@ -309,23 +253,23 @@ class Message(object):
             self.form = form
 
     class Mention(str):
-       """ A user mentioned such @user """
-       def __new__(cls, *args, **kw):
+        """ A user mentioned such @user """
+        def __new__(cls, *args, **kw):
             return str.__new__(cls, *args, **kw)
 
     class Hashtag(str):
-       """ A topic mentioned such #topic """
-       def __new__(cls, *args, **kw):
+        """ A topic mentioned such #topic """
+        def __new__(cls, *args, **kw):
             return str.__new__(cls, *args, **kw)
 
     class Word(str):
-       """ Some plain text such blablabla """
-       def __new__(cls, *args, **kw):
+        """ Some plain text such blablabla """
+        def __new__(cls, *args, **kw):
             return str.__new__(cls, *args, **kw)
 
     class Number(int):
-       """ Some number such 409812 """
-       def __new__(cls, *args, **kw):
+        """ Some number such 409812 """
+        def __new__(cls, *args, **kw):
             return int.__new__(cls, *args, **kw)
 
     class Form(object):
@@ -351,4 +295,3 @@ class Message(object):
             else:
                 raise TypeError('{} is not a valid element type'.format(type(element)))
         return ' '.join(tokens)
-

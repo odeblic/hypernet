@@ -56,13 +56,13 @@ services:
     required_roles:
       - trader
       - manager
-  - plugin: echo
+  - plugin_id: echo
     required_roles:
       - trader
       - manager
 
 connectors:
-  - id: symphony
+  - plugin_id: symphony
     module: 'file:connectors/symphony.py'
     arguments: 'config/bot73/rsa_config.json'
 #    arguments: 'config/bot89/rsa_config.json'
@@ -78,7 +78,7 @@ connectors:
         network_id: 349026222344326
       - <<: *bot89
         network_id: 349026222344358
-  - id: email
+  - plugin_id: email
     module: 'file:connectors/email.py'
     arguments: 'config/connectors/email.ini'
     sizemax: 1024    # KB

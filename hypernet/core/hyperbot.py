@@ -1,19 +1,17 @@
 import abc
+import event
 import logging
-
-
-
-
 
 import collections
 
+
+"""
 Subscriptions = collections.namedtuple('Subscription' , 'hashtags cashtags mentions')
 subscriptions = Subscriptions(dict(), dict(), dict())
 subscriptions = Subscriptions({1, 2, 3}, dict(), dict())
 
 getattr(subscriptions, 'hashtags')
-
-
+"""
 
 
 class Subscriptions(object):
@@ -69,24 +67,24 @@ class Subscriptions(object):
 
 
 class Bot(abc.ABC):
-    def __init__(self, name=None):
-        self.__name = name
+    def __init__(self):
         self.__subscriptions = Subscriptions()
 
+    @abc.abstractmethod
     def get_name(self):
-        return self.__name
+        pass
 
     def on_event(self, event):
-        logging.debug('bot {} got an event: {}'.format(self.__name, event)
+        logging.debug('bot {} got an event: {}'.format('self.__name', event))
         if event.category == event.categories.MSG:
             msg = event.payload
-            msg.
+            # msg.receiver
         elif event.category == event.categories.MSG:
-            services = subscriptions.get_subscribers()
+            services = self.__subscriptions.get_subscribers()
             for service in services:
                 service.on_event(event)
         else:
-            raise
+            logging.error('this category of event is not accepted here: {}'.format(event.category))
 
     def subscribe(self, subscriber, *, hashtags=[], cashtags=[], mentions=[], senders=[], receivers=[], conversations=[], networks=[]):
         for hashtag in hashtags:
@@ -129,7 +127,11 @@ class Bot(abc.ABC):
 
 class NamedBot(Bot):
     def __init__(self, name):
-        super().__init__(name)
+        super().__init__()
+        self.__name = name
+
+    def get_name(self):
+        return self.__name
 
     def send(self, channel, message):
         logging.debug('bot {} is sending to {}'.format(self.__name, channel.get_sender()))
@@ -163,7 +165,10 @@ class NamedBot(Bot):
         return channel.__class__(sender, receiver, conversation, other_network)
 
 
-class DefaultBot(Bot):
+class AnonymousBot(Bot):
     def __init__(self):
         super().__init__()
+
+    def get_name(self):
+        return None
 
